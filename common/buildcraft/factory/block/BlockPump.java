@@ -13,6 +13,7 @@ import net.minecraft.world.World;
 import buildcraft.lib.block.BlockBCTile_Neptune;
 
 import buildcraft.factory.tile.TilePump;
+import buildcraft.factory.tile.TilePump2;
 
 public class BlockPump extends BlockBCTile_Neptune {
     public BlockPump(Material material, String id) {
@@ -21,6 +22,6 @@ public class BlockPump extends BlockBCTile_Neptune {
 
     @Override
     public TileEntity createNewTileEntity(World worldIn, int meta) {
-        return new TilePump();
+        return new TilePump2();
     }
 }

@@ -93,6 +93,7 @@ public class BCFactory {
         registerTag("tile.autoworkbench.item").reg("autoworkbench_item");
         registerTag("tile.mining_well").reg("mining_well");
         registerTag("tile.pump").reg("pump");
+        registerTag("tile.pump2").reg("pump2");
         registerTag("tile.flood_gate").reg("flood_gate");
         registerTag("tile.tank").reg("tank");
         registerTag("tile.chute").reg("chute");

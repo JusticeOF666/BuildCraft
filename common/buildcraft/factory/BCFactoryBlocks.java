@@ -4,6 +4,7 @@
  * distributed with this file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 package buildcraft.factory;
 
+import buildcraft.factory.tile.*;
 import net.minecraft.block.material.Material;
 
 import buildcraft.lib.BCLib;
@@ -20,15 +21,6 @@ import buildcraft.factory.block.BlockPump;
 import buildcraft.factory.block.BlockTank;
 import buildcraft.factory.block.BlockTube;
 import buildcraft.factory.block.BlockWaterGel;
-import buildcraft.factory.tile.TileAutoWorkbenchItems;
-import buildcraft.factory.tile.TileChute;
-import buildcraft.factory.tile.TileDistiller_BC8;
-import buildcraft.factory.tile.TileFloodGate;
-import buildcraft.factory.tile.TileHeatExchangeEnd;
-import buildcraft.factory.tile.TileHeatExchangeStart;
-import buildcraft.factory.tile.TileMiningWell;
-import buildcraft.factory.tile.TilePump;
-import buildcraft.factory.tile.TileTank;
 
 public class BCFactoryBlocks {
     public static BlockAutoWorkbenchItems autoWorkbenchItems;
@@ -65,6 +57,7 @@ public class BCFactoryBlocks {
         TileBC_Neptune.registerTile(TileAutoWorkbenchItems.class, "tile.autoworkbench.item");
         TileBC_Neptune.registerTile(TileMiningWell.class, "tile.mining_well");
         TileBC_Neptune.registerTile(TilePump.class, "tile.pump");
+        TileBC_Neptune.registerTile(TilePump2.class, "tile.pump2");
         TileBC_Neptune.registerTile(TileFloodGate.class, "tile.flood_gate");
         TileBC_Neptune.registerTile(TileTank.class, "tile.tank");
         TileBC_Neptune.registerTile(TileChute.class, "tile.chute");
