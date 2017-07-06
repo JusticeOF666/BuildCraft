@@ -81,10 +81,7 @@ public abstract class TileMiner extends TileBC_Neptune implements ITickable, IDe
 
         battery.tick(getWorld(), getPos());
 
-        // if (worldObj.rand.nextDouble() > 0.9) { // is this correct?
-        if (true) {
-            sendNetworkUpdate(NET_LED_STATUS);
-        }
+        sendNetworkUpdate(NET_LED_STATUS);
 
         initCurrentPos();
 

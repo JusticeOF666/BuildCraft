@@ -34,7 +34,6 @@ import buildcraft.lib.net.PacketBufferBC;
 public class TilePump2 extends TileMiner {
     private final Tank tank = new Tank("tank", 16 * Fluid.BUCKET_VOLUME, this);
     private final int updateEvery = 25;  // ticks
-    private boolean c = true;
     private final ArrayDeque<BlockPos> LocationDeque = new ArrayDeque<>();
 
     @Nullable
@@ -62,18 +61,28 @@ public class TilePump2 extends TileMiner {
     protected void initCurrentPos() {;}
 
     private void floodFill(BlockPos start) {
-        if (canDrain(start) && !LocationDeque.contains(start))
-            LocationDeque.addLast(start);
-        else
-            return;
+        Queue<BlockPos> queue = new LinkedList<>();
+        queue.add(start);
 
-        // System.out.println(LocationDeque); lmao console overflow
+        int count = 0;
+        while (!queue.isEmpty() || count > 200) {
+            BlockPos p = queue.remove();
 
-        floodFill(new BlockPos(start.down()));
-        floodFill(new BlockPos(start.north()));
-        floodFill(new BlockPos(start.east()));
-        floodFill(new BlockPos(start.south()));
-        floodFill(new BlockPos(start.west()));
+            if (BlockUtil.getFluidWithFlowing(world, p) != null && !LocationDeque.contains(p)) {
+                if (canDrain(p))
+                    LocationDeque.addLast(p);
+                queue.add(new BlockPos(p.down()));
+                queue.add(new BlockPos(p.north()));
+                queue.add(new BlockPos(p.east()));
+                queue.add(new BlockPos(p.south()));
+                queue.add(new BlockPos(p.west()));
+                count++;
+            }
+        }
+
+        System.out.println("Found " + count + " fluid blocks");
+
+
     }
 
     private BlockPos touch() {
