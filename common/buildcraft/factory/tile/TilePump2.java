@@ -12,11 +12,14 @@ import java.util.*;
 import javax.annotation.Nullable;
 
 import buildcraft.api.core.BCLog;
+import it.unimi.dsi.fastutil.ints.IntArrays;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 
 import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidRegistry;
+import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
 
@@ -34,6 +37,7 @@ import buildcraft.lib.net.PacketBufferBC;
 public class TilePump2 extends TileMiner {
     private final Tank tank = new Tank("tank", 16 * Fluid.BUCKET_VOLUME, this);
     private final int updateEvery = 25;  // ticks
+    private boolean infiniteSource = false;
     private final ArrayDeque<BlockPos> LocationDeque = new ArrayDeque<>();
 
     @Nullable
@@ -65,10 +69,19 @@ public class TilePump2 extends TileMiner {
         queue.add(start);
 
         int count = 0;
-        while (!queue.isEmpty() || count > 200) {
+        while (!queue.isEmpty()) {
+            if (count >= 3)
+                if (BlockUtil.getFluid(world, LocationDeque.peek()) == FluidRegistry.WATER) {   // no infinite uu-matter
+                    LocationDeque.clear();  // don't need this if it's infinite
+                    LocationDeque.add(start);  // add the original source block to (fake) drain from
+                    this.infiniteSource = true;
+                    System.out.println("Infinite water source");
+                    return;
+                }
+
             BlockPos p = queue.remove();
 
-            if (BlockUtil.getFluidWithFlowing(world, p) != null && !LocationDeque.contains(p)) {
+            if (BlockUtil.getFluidWithFlowing(world, p) != null && (!LocationDeque.contains(p) || p == start)) {
                 if (canDrain(p))
                     LocationDeque.addLast(p);
                 queue.add(new BlockPos(p.down()));
@@ -80,15 +93,14 @@ public class TilePump2 extends TileMiner {
             }
         }
 
+        this.infiniteSource = false;
         System.out.println("Found " + count + " fluid blocks");
-
-
     }
 
     private BlockPos touch() {
         BlockPos searchPos = this.pos.down();
 
-        while (searchPos.getY() > 0) {
+        while (searchPos.getY() >= 0) {
             if (!world.isAirBlock(searchPos)) {
                 if (canDrain(searchPos))
                     return searchPos;
@@ -96,17 +108,16 @@ public class TilePump2 extends TileMiner {
                     return null;
             }
 
-            System.out.println(searchPos.getY());
             searchPos = searchPos.down();
         }
-        BCLog.logger.error("You pump up void");
+        BCLog.logger.error("You're trying to pump up void");
         return null;
     }
 
 
     @Override
     public void update() {
-        if (world.getTotalWorldTime() % this.updateEvery == 0) {  // !world.isRemote &&
+        if (!world.isRemote && world.getTotalWorldTime() % this.updateEvery == 0) {
             BlockPos t = touch();
             if (t != null)
                 floodFill(t);
@@ -120,8 +131,22 @@ public class TilePump2 extends TileMiner {
     @Override
     public void mine() {
         // currentPos = pos;
-        if (!LocationDeque.isEmpty())
-            BlockUtil.drainBlock(world, LocationDeque.pop(), true);
+        if (LocationDeque.isEmpty())
+            return;
+
+        BlockPos toBeDrained = LocationDeque.peek();
+        System.out.println(toBeDrained);
+        FluidStack drain = BlockUtil.drainBlock(world, toBeDrained, false);
+        System.out.println(infiniteSource);
+
+
+        if (infiniteSource)
+            tank.fillInternal(drain, true);
+        //else {
+        //    tank.fillInternal(drain, true);
+        //    BlockUtil.drainBlock(world, toBeDrained, true);
+        //    LocationDeque.remove();
+        //}
     }
 
     // NBT

@@ -209,6 +209,7 @@ public class TilePump extends TileMiner {
     @Override
     public void mine() {
         boolean prevResult = true;
+        int i = 0;
         while (prevResult) {
             prevResult = false;
             if (tank.isFull()) {
@@ -223,6 +224,8 @@ public class TilePump extends TileMiner {
                         paths.get(currentPos).stream()
                             .allMatch(blockPos -> BlockUtil.getFluidWithFlowing(world, blockPos) != null) &&
                         canDrain(currentPos)) {
+
+                        System.out.println(drain.amount);
                         tank.fillInternal(drain, true);
                         progress = 0;
                         int count = 0;
@@ -238,6 +241,8 @@ public class TilePump extends TileMiner {
                         }
                         if (count < 4) {
                             BlockUtil.drainBlock(world, currentPos, true);
+                            i++;
+                            System.out.println(i);
                             if (FluidUtilBC.areFluidsEqual(drain.getFluid(), BCEnergyFluids.crudeOil[0])) {
                                 if (oilSpringPos != null) {
                                     TileEntity tile = world.getTileEntity(oilSpringPos);
